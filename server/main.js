@@ -1,31 +1,47 @@
 import { Meteor } from 'meteor/meteor';
-import { LinksCollection } from '/imports/api/links';
+import { Products, Parts } from '/imports/api/collections';
 
-function insertLink({ title, url }) {
-  LinksCollection.insert({title, url, createdAt: new Date()});
-}
+// initialization values
+const COMPANY_COUNT = 5;
+const PRODUCT_COUNT = 1000;
+const PART_COUNT = 1000;
 
 Meteor.startup(() => {
-  // If the Links collection is empty, add some data.
-  if (LinksCollection.find().count() === 0) {
-    insertLink({
-      title: 'Do the Tutorial',
-      url: 'https://www.meteor.com/tutorials/react/creating-an-app'
-    });
 
-    insertLink({
-      title: 'Follow the Guide',
-      url: 'http://guide.meteor.com'
-    });
+  const companyNames = Array(COMPANY_COUNT).fill().map(() => {
+    return faker.company.companyName()
+  });
 
-    insertLink({
-      title: 'Read the Docs',
-      url: 'https://docs.meteor.com'
-    });
+  if (Products.find().count() === 0) {
+    console.log('generating products');
 
-    insertLink({
-      title: 'Discussions',
-      url: 'https://forums.meteor.com'
-    });
+    for (let i = 0; i < PRODUCT_COUNT; i++) {
+      Products.insert({
+        name: faker.commerce.product(),
+        color: faker.internet.color(),
+        price: faker.commerce.price(),
+        image: faker.image.fashion(),
+        country: faker.address.country(),
+        company: companyNames[Math.floor(Math.random() * COMPANY_COUNT)],
+        date: faker.date.past()
+      });
+    }
+  }
+
+  if (Parts.find().count() === 0) {
+    console.log('generating parts');
+
+    const partTypes = ['Shelf', 'Base', 'Back', 'Box', 'Holder'];
+
+    for (let i = 0; i < PART_COUNT; i++){
+      Parts.insert({
+        name: faker.commerce.productName(),
+        color: faker.internet.color(),
+        price: faker.commerce.price(),
+        type: partTypes[Math.floor(Math.random() * partTypes.length)],
+        company: companyNames[Math.floor(Math.random() * COMPANY_COUNT)],
+        date: faker.date.past()
+      });
+    }
   }
 });
